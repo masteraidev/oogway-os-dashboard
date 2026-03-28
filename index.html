@@ -124,7 +124,7 @@
                 chatInput.value = transcript;
                 
                 if (event.results[0].isFinal) {
-                    sendMessage();
+                    setTimeout(() => sendMessage(), 300);
                 }
             };
             
@@ -255,16 +255,21 @@
                 // Process message and respond
                 setTimeout(() => {
                     let response = "";
+                    const lowerText = text.toLowerCase();
                     
-                    // Simple command processing
-                    if (text.toLowerCase().includes("market") || text.toLowerCase().includes("price")) {
+                    // Command processing
+                    if (lowerText.includes("market") || lowerText.includes("price") || lowerText.includes("stocks")) {
                         response = "The market section shows live prices for BTC, ETH, AAPL, and TSLA. They update every 2 seconds.";
-                    } else if (text.toLowerCase().includes("help")) {
-                        response = "I'm Master Oogway. You can ask me about market data, dashboard features, or enable voice input with the microphone button.";
-                    } else if (text.toLowerCase().includes("hello") || text.toLowerCase().includes("hi")) {
+                    } else if (lowerText.includes("help") || lowerText.includes("commands")) {
+                        response = "I'm Master Oogway. You can ask: 'What's the market?' 'Help me' 'Hello' or use voice commands.";
+                    } else if (lowerText.includes("hello") || lowerText.includes("hi") || lowerText.includes("hey")) {
                         response = "Greetings! I'm Master Oogway, your autonomous assistant. How may I assist you today?";
-                    } else if (text.toLowerCase().includes("record") || text.toLowerCase().includes("mic") || text.toLowerCase().includes("voice")) {
-                        response = "Click the 🎤 microphone button to enable voice input, then speak your message.";
+                    } else if (lowerText.includes("record") || lowerText.includes("mic") || lowerText.includes("voice") || lowerText.includes("speak")) {
+                        response = "Click the 🎤 microphone button to enable voice input, then speak your message. Click 🔊 to hear my response.";
+                    } else if (lowerText.includes("tenacit") || lowerText.includes("mission control")) {
+                        response = "TenacitOS Mission Control is live at mission-control-chi-liart.vercel.app. Password is 'oogway'.";
+                    } else if (lowerText.includes("dashboard") || lowerText.includes("oogway")) {
+                        response = "OOGWAY OS Dashboard is live at oogway-os-host.vercel.app with voice features and market data.";
                     } else {
                         response = "I'm Master Oogway. How can I assist you today?";
                     }
@@ -279,9 +284,10 @@
         };
         
         addMessage("Welcome to OOGWAY OS Dashboard!", false);
-        addMessage("I'm here to help you navigate your metrics and tools.", false);
-        addMessage("Click 🎤 to enable voice input, click 🔊 to enable voice output.", false);
-        speakText("Welcome to OOGWAY OS Dashboard. I'm Master Oogway, ready to assist you. Click the microphone button to enable voice input.");
+        addMessage("I'm Master Oogway, your autonomous assistant.", false);
+        addMessage("Click 🎤 to speak to me, click 🔊 to hear my responses.", false);
+        addMessage("Try saying: 'What's the market?' or 'Help me'", false);
+        speakText("Welcome to OOGWAY OS Dashboard. I am Master Oogway. Click the microphone button and speak to me. Try saying: What's the market?");
         
         // Real-time metrics updates
         let taskCount = 0, revenue = 0;
