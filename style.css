@@ -339,6 +339,40 @@ section h2 {
     border-top: 1px solid rgba(0, 255, 255, 0.2);
 }
 
+#voice-toggle {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+    border: none;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: transform 0.2s, background 0.2s;
+}
+
+#voice-toggle:hover {
+    transform: scale(1.1);
+    background: linear-gradient(135deg, #ff8585, #ff6b6b);
+}
+
+#voice-toggle:active {
+    transform: scale(0.95);
+}
+
+#voice-status {
+    margin-left: 10px;
+    font-size: 14px;
+}
+
+.voice-on {
+    color: #00ff00;
+    text-shadow: 0 0 5px #00ff00;
+}
+
+.voice-off {
+    color: #888;
+}
+
 #chat-input {
     flex: 1;
     background: rgba(0, 20, 40, 0.8);
