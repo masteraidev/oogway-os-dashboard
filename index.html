@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OOGWAY OS</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/three@latest/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+</head>
+<body>
+    <div id="os-container">
+        <div id="three-container"></div>
+        <div id="ui-layer">
+            <header id="header">
+                <h1>OOGWAY OS</h1>
+                <div id="metrics">
+                    <div class="metric"><span class="label">Tasks</span><span id="task-counter">0</span></div>
+                    <div class="metric"><span class="label">Revenue</span><span id="revenue-tracker">R0</span></div>
+                    <div class="metric"><span class="label">Uptime</span><span id="uptime-clock">00:00:00</span></div>
+                    <div class="metric"><span class="label">Agents Live</span><span id="agents-live">0</span></div>
+                </div>
+            </header>
+            <main id="main">
+                <section id="agent-panel">
+                    <h2>Agent Control</h2>
+                    <div id="agent-list"></div>
+                    <div id="agent-drawer" class="drawer">
+                        <div class="drawer-header">
+                            <span id="drawer-title">Agent Name</span>
+                            <button id="close-drawer">×</button>
+                        </div>
+                        <div id="drawer-content" class="activity-log"></div>
+                    </div>
+                </section>
+                <section id="feed-panel">
+                    <h2>Live Feed</h2>
+                    <div id="feed-container"></div>
+                </section>
+                <section id="deploy-panel">
+                    <h2>Quick Deploy</h2>
+                    <div id="deploy-buttons"></div>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
