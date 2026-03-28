@@ -41,9 +41,92 @@
                     <h2>Quick Deploy</h2>
                     <div id="deploy-buttons"></div>
                 </section>
+                
+                <!-- Chat Widget Section -->
+                <section id="chat-section">
+                    <h2>Chat Assistant</h2>
+                    <div id="chat-widget">
+                        <div id="chat-messages"></div>
+                        <div id="chat-input-container">
+                            <input type="text" id="chat-input" placeholder="Type a message...">
+                            <button id="chat-send">Send</button>
+                        </div>
+                    </div>
+                </section>
             </main>
         </div>
     </div>
     <script type="module" src="main.js"></script>
+    
+    <!-- Chat Widget & Metrics Script -->
+    <script>
+        // Simple Chat Widget Implementation
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const chatSend = document.getElementById('chat-send');
+        
+        let messages = [];
+        
+        // Add message to chat
+        function addMessage(text, isUser = true) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = isUser ? 'message user' : 'message bot';
+            msgDiv.textContent = text;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            messages.push({ text, isUser, time: new Date() });
+        }
+        
+        // Send message
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (text) {
+                addMessage(text, true);
+                chatInput.value = '';
+                
+                // Simulate bot response
+                setTimeout(() => {
+                    addMessage("I'm Master Oogway. How can I assist you today?", false);
+                }, 500);
+            }
+        }
+        
+        chatSend.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        // Initialize with welcome message
+        addMessage("Welcome to OOGWAY OS Dashboard!", false);
+        addMessage("I'm here to help you navigate your metrics and tools.", false);
+        
+        // Real-time metrics updates
+        let taskCount = 0;
+        let revenue = 0;
+        
+        setInterval(() => {
+            // Update tasks
+            taskCount += Math.floor(Math.random() * 3);
+            document.getElementById('task-counter').textContent = taskCount;
+            
+            // Update revenue (simulated)
+            revenue += Math.floor(Math.random() * 100);
+            document.getElementById('revenue-tracker').textContent = 'R' + revenue.toLocaleString();
+            
+            // Update agents live
+            const agentsLive = Math.floor(Math.random() * 10) + 1;
+            document.getElementById('agents-live').textContent = agentsLive;
+        }, 2000);
+        
+        // Update uptime clock
+        let uptimeSeconds = 0;
+        setInterval(() => {
+            uptimeSeconds++;
+            const hours = Math.floor(uptimeSeconds / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((uptimeSeconds % 3600) / 60).toString().padStart(2, '0');
+            const seconds = (uptimeSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('uptime-clock').textContent = `${hours}:${minutes}:${seconds}`;
+        }, 1000);
+    </script>
 </body>
 </html>
