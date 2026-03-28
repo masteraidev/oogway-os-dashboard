@@ -48,10 +48,10 @@
                     <div id="chat-widget">
                         <div id="chat-messages"></div>
                         <div id="chat-input-container">
-                            <input type="text" id="chat-input" placeholder="Type or speak a message...">
+                            <input type="text" id="chat-input" placeholder="Type here or click 🎤 to speak...">
                             <button id="chat-send">Send</button>
-                            <button id="voice-toggle" title="Toggle Voice Output">🔊</button>
-                            <button id="mic-toggle" title="Voice Input">🎤</button>
+                            <button id="voice-toggle" title="Enable voice output">🔊</button>
+                            <button id="mic-toggle" title="Enable voice input">🎤</button>
                         </div>
                     </div>
                 </section>
@@ -113,7 +113,7 @@
         
         if (SpeechRecognition) {
             recognition = new SpeechRecognition();
-            recognition.continuous = false;
+            recognition.continuous = true;
             recognition.interimResults = true;
             recognition.lang = 'en-US';
             
@@ -124,28 +124,38 @@
                 chatInput.value = transcript;
                 
                 if (event.results[0].isFinal) {
-                    setTimeout(() => sendMessage(), 300);
+                    setTimeout(() => sendMessage(), 500);
                 }
             };
             
             recognition.onerror = (event) => {
                 console.log('Speech recognition error:', event.error);
                 if (event.error === 'not-allowed') {
-                    addMessage("Microphone access denied. Please enable microphone permissions in your browser.", false);
+                    addMessage("❌ Microphone access denied. Please allow microphone in browser settings.", false);
                     voiceInputEnabled = false;
                     micToggle.classList.remove('active');
                     micToggle.style.background = 'linear-gradient(135deg, #666, #444)';
                 } else if (event.error === 'no-speech') {
-                    addMessage("No speech detected. Try speaking again.", false);
+                    addMessage("⚠️ No speech detected. Try speaking louder.", false);
                 } else if (event.error === 'audio-capture') {
-                    addMessage("No microphone found. Please connect a microphone.", false);
+                    addMessage("❌ No microphone found. Please connect a microphone.", false);
+                } else if (event.error === 'network') {
+                    addMessage("🌐 Network error. Speech recognition requires internet connection.", false);
                 }
             };
             
             recognition.onend = () => {
                 if (voiceInputEnabled) {
-                    recognition.start();
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.log('Recognition restart error:', e);
+                    }
                 }
+            };
+            
+            recognition.onstart = () => {
+                addMessage("🎤 Microphone active. Speak now...", false);
             };
         }
         
@@ -170,24 +180,31 @@
         }
         
         chatSend.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+        chatInput.addEventListener('keypress', (e) => { 
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
         
         // Voice Output Toggle (ElevenLabs TTS)
         voiceToggle.addEventListener('click', () => {
             voiceOutputEnabled = !voiceOutputEnabled;
+            voiceToggle.textContent = voiceOutputEnabled ? '🔊' : '🔇';
             voiceStatus.textContent = voiceOutputEnabled ? '🔊' : '🔇';
             voiceStatus.className = voiceOutputEnabled ? 'voice-on' : 'voice-off';
             addMessage(`Voice output ${voiceOutputEnabled ? 'enabled' : 'disabled'}`, false);
             
             if (voiceOutputEnabled) {
-                speakText("Voice output enabled. I'm Master Oogway, ready to assist you.");
+                speakText("Voice output enabled. I am Master Oogway, ready to assist you.");
             }
         });
         
         // Microphone Input Toggle (Web Speech API)
         micToggle.addEventListener('click', () => {
             if (!recognition) {
-                addMessage("Speech recognition not supported in this browser. Try Chrome.", false);
+                addMessage("❌ Speech recognition not supported in this browser.", false);
+                addMessage("✅ Try using Chrome or Edge browser.", false);
                 return;
             }
             
@@ -198,18 +215,29 @@
                 'linear-gradient(135deg, #666, #444)';
             
             if (voiceInputEnabled) {
-                recognition.start();
-                addMessage("🎤 Microphone active. Speak now...", false);
-                speakText("Microphone active. Speak now.");
+                try {
+                    recognition.start();
+                    addMessage("🎤 Microphone enabled. Speak now...", false);
+                    addMessage("Try saying: 'What's the market?'", false);
+                } catch (e) {
+                    addMessage("❌ Error: " + e.message, false);
+                    voiceInputEnabled = false;
+                    micToggle.classList.remove('active');
+                    micToggle.style.background = 'linear-gradient(135deg, #666, #444)';
+                }
             } else {
-                recognition.stop();
-                addMessage("🎤 Microphone disabled.", false);
+                try {
+                    recognition.stop();
+                    addMessage("🎤 Microphone disabled.", false);
+                } catch (e) {
+                    console.log('Stop error:', e);
+                }
             }
         });
         
         // ElevenLabs Text-to-Speech
         async function speakText(text) {
-            if (!voiceEnabled) return;
+            if (!voiceOutputEnabled) return;
             
             try {
                 const response = await fetch(
@@ -258,36 +286,47 @@
                     const lowerText = text.toLowerCase();
                     
                     // Command processing
-                    if (lowerText.includes("market") || lowerText.includes("price") || lowerText.includes("stocks")) {
+                    if (lowerText.includes("market") || lowerText.includes("price") || lowerText.includes("stocks") || lowerText.includes("btc") || lowerText.includes("crypto")) {
                         response = "The market section shows live prices for BTC, ETH, AAPL, and TSLA. They update every 2 seconds.";
-                    } else if (lowerText.includes("help") || lowerText.includes("commands")) {
+                    } else if (lowerText.includes("help") || lowerText.includes("commands") || lowerText.includes("what can you do")) {
                         response = "I'm Master Oogway. You can ask: 'What's the market?' 'Help me' 'Hello' or use voice commands.";
-                    } else if (lowerText.includes("hello") || lowerText.includes("hi") || lowerText.includes("hey")) {
+                    } else if (lowerText.includes("hello") || lowerText.includes("hi") || lowerText.includes("hey") || lowerText.includes("greetings")) {
                         response = "Greetings! I'm Master Oogway, your autonomous assistant. How may I assist you today?";
-                    } else if (lowerText.includes("record") || lowerText.includes("mic") || lowerText.includes("voice") || lowerText.includes("speak")) {
+                    } else if (lowerText.includes("record") || lowerText.includes("mic") || lowerText.includes("voice") || lowerText.includes("speak") || lowerText.includes("talk")) {
                         response = "Click the 🎤 microphone button to enable voice input, then speak your message. Click 🔊 to hear my response.";
-                    } else if (lowerText.includes("tenacit") || lowerText.includes("mission control")) {
+                    } else if (lowerText.includes("tenacit") || lowerText.includes("mission control") || lowerText.includes("tenacitos")) {
                         response = "TenacitOS Mission Control is live at mission-control-chi-liart.vercel.app. Password is 'oogway'.";
-                    } else if (lowerText.includes("dashboard") || lowerText.includes("oogway")) {
+                    } else if (lowerText.includes("dashboard") || lowerText.includes("oogway") || lowerText.includes("home")) {
                         response = "OOGWAY OS Dashboard is live at oogway-os-host.vercel.app with voice features and market data.";
+                    } else if (lowerText.includes("thank")) {
+                        response = "You're welcome! I'm Master Oogway, always ready to assist you.";
                     } else {
                         response = "I'm Master Oogway. How can I assist you today?";
                     }
                     
                     addMessage(response, false);
                     
-                    if (voiceOutputEnabled) {
+                    if (voiceOutputEnabled && response) {
                         speakText(response);
                     }
                 }, 500);
             }
         };
         
-        addMessage("Welcome to OOGWAY OS Dashboard!", false);
+        addMessage("=== OOGWAY OS DASHBOARD ===", false);
         addMessage("I'm Master Oogway, your autonomous assistant.", false);
-        addMessage("Click 🎤 to speak to me, click 🔊 to hear my responses.", false);
-        addMessage("Try saying: 'What's the market?' or 'Help me'", false);
-        speakText("Welcome to OOGWAY OS Dashboard. I am Master Oogway. Click the microphone button and speak to me. Try saying: What's the market?");
+        addMessage("", false);
+        addMessage("TO ENABLE VOICE:", false);
+        addMessage("1. Click the 🎤 button (turns green)", false);
+        addMessage("2. Allow microphone access when prompted", false);
+        addMessage("3. Speak your message clearly", false);
+        addMessage("4. Click 🔊 to hear my response", false);
+        addMessage("", false);
+        addMessage("TRY SAYING:", false);
+        addMessage("- 'What's the market looking like?'", false);
+        addMessage("- 'Help me with the dashboard'", false);
+        addMessage("- 'Hello Master Oogway'", false);
+        speakText("Welcome to OOGWAY OS Dashboard. I am Master Oogway. To enable voice, click the microphone button, allow access, and speak to me. Try saying: What's the market looking like?");
         
         // Real-time metrics updates
         let taskCount = 0, revenue = 0;
