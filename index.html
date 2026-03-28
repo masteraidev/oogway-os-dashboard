@@ -53,6 +53,36 @@
                         </div>
                     </div>
                 </section>
+                
+                <!-- Market Data Section -->
+                <section id="market-section">
+                    <h2>Market Data</h2>
+                    <div class="market-grid">
+                        <div class="market-card">
+                            <div class="market-symbol">BTC/USD</div>
+                            <div class="market-price" id="btc-price">--</div>
+                            <div class="market-change" id="btc-change">--</div>
+                        </div>
+                        <div class="market-card">
+                            <div class="market-symbol">ETH/USD</div>
+                            <div class="market-price" id="eth-price">--</div>
+                            <div class="market-change" id="eth-change">--</div>
+                        </div>
+                        <div class="market-card">
+                            <div class="market-symbol">AAPL</div>
+                            <div class="market-price" id="aapl-price">--</div>
+                            <div class="market-change" id="aapl-change">--</div>
+                        </div>
+                        <div class="market-card">
+                            <div class="market-symbol">TSLA</div>
+                            <div class="market-price" id="tsla-price">--</div>
+                            <div class="market-change" id="tsla-change">--</div>
+                        </div>
+                    </div>
+                    <div class="market-chart-container">
+                        <canvas id="marketChart" width="400" height="150"></canvas>
+                    </div>
+                </section>
             </main>
         </div>
     </div>
@@ -60,14 +90,12 @@
     
     <!-- Chat Widget & Metrics Script -->
     <script>
-        // Simple Chat Widget Implementation
+        // Chat Widget Implementation
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
         const chatSend = document.getElementById('chat-send');
-        
         let messages = [];
         
-        // Add message to chat
         function addMessage(text, isUser = true) {
             const msgDiv = document.createElement('div');
             msgDiv.className = isUser ? 'message user' : 'message bot';
@@ -77,14 +105,11 @@
             messages.push({ text, isUser, time: new Date() });
         }
         
-        // Send message
         function sendMessage() {
             const text = chatInput.value.trim();
             if (text) {
                 addMessage(text, true);
                 chatInput.value = '';
-                
-                // Simulate bot response
                 setTimeout(() => {
                     addMessage("I'm Master Oogway. How can I assist you today?", false);
                 }, 500);
@@ -92,33 +117,21 @@
         }
         
         chatSend.addEventListener('click', sendMessage);
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
+        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
         
-        // Initialize with welcome message
         addMessage("Welcome to OOGWAY OS Dashboard!", false);
         addMessage("I'm here to help you navigate your metrics and tools.", false);
         
         // Real-time metrics updates
-        let taskCount = 0;
-        let revenue = 0;
-        
+        let taskCount = 0, revenue = 0;
         setInterval(() => {
-            // Update tasks
             taskCount += Math.floor(Math.random() * 3);
             document.getElementById('task-counter').textContent = taskCount;
-            
-            // Update revenue (simulated)
             revenue += Math.floor(Math.random() * 100);
             document.getElementById('revenue-tracker').textContent = 'R' + revenue.toLocaleString();
-            
-            // Update agents live
-            const agentsLive = Math.floor(Math.random() * 10) + 1;
-            document.getElementById('agents-live').textContent = agentsLive;
+            document.getElementById('agents-live').textContent = Math.floor(Math.random() * 10) + 1;
         }, 2000);
         
-        // Update uptime clock
         let uptimeSeconds = 0;
         setInterval(() => {
             uptimeSeconds++;
@@ -126,6 +139,81 @@
             const minutes = Math.floor((uptimeSeconds % 3600) / 60).toString().padStart(2, '0');
             const seconds = (uptimeSeconds % 60).toString().padStart(2, '0');
             document.getElementById('uptime-clock').textContent = `${hours}:${minutes}:${seconds}`;
+        }, 1000);
+        
+        // Market Data Simulation (Real API integration would require backend)
+        const marketPrices = {
+            'BTC': { price: 67500, change: 2.5 },
+            'ETH': { price: 3450, change: 1.8 },
+            'AAPL': { price: 178.50, change: -0.5 },
+            'TSLA': { price: 245.30, change: 1.2 }
+        };
+        
+        function updateMarketData() {
+            // Simulate real-time price updates
+            Object.keys(marketPrices).forEach(symbol => {
+                const data = marketPrices[symbol];
+                const volatility = Math.random() * 0.5 - 0.25;
+                data.price = data.price * (1 + volatility / 100);
+                data.change = (Math.random() * 4 - 2).toFixed(2);
+            });
+            
+            document.getElementById('btc-price').textContent = '$' + marketPrices.BTC.price.toFixed(2);
+            document.getElementById('btc-change').textContent = marketPrices.BTC.change + '%';
+            document.getElementById('btc-change').style.color = marketPrices.BTC.change >= 0 ? '#00ff00' : '#ff0000';
+            
+            document.getElementById('eth-price').textContent = '$' + marketPrices.ETH.price.toFixed(2);
+            document.getElementById('eth-change').textContent = marketPrices.ETH.change + '%';
+            document.getElementById('eth-change').style.color = marketPrices.ETH.change >= 0 ? '#00ff00' : '#ff0000';
+            
+            document.getElementById('aapl-price').textContent = '$' + marketPrices.AAPL.price.toFixed(2);
+            document.getElementById('aapl-change').textContent = marketPrices.AAPL.change + '%';
+            document.getElementById('aapl-change').style.color = marketPrices.AAPL.change >= 0 ? '#00ff00' : '#ff0000';
+            
+            document.getElementById('tsla-price').textContent = '$' + marketPrices.TSLA.price.toFixed(2);
+            document.getElementById('tsla-change').textContent = marketPrices.TSLA.change + '%';
+            document.getElementById('tsla-change').style.color = marketPrices.TSLA.change >= 0 ? '#00ff00' : '#ff0000';
+        }
+        
+        // Update market data every 2 seconds
+        setInterval(updateMarketData, 2000);
+        updateMarketData();
+        
+        // Market Chart
+        const ctx = document.getElementById('marketChart').getContext('2d');
+        const marketChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 20}, (_, i) => i),
+                datasets: [{
+                    label: 'BTC/USD',
+                    data: Array.from({length: 20}, () => 67000 + Math.random() * 1000),
+                    borderColor: '#f7931a',
+                    backgroundColor: 'rgba(247, 147, 26, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { display: false },
+                    y: { 
+                        display: true,
+                        ticks: { color: '#888' },
+                        grid: { color: 'rgba(255,255,255,0.1)' }
+                    }
+                }
+            }
+        });
+        
+        // Update chart data
+        setInterval(() => {
+            marketChart.data.datasets[0].data.shift();
+            marketChart.data.datasets[0].data.push(67000 + Math.random() * 1000);
+            marketChart.update('none');
         }, 1000);
     </script>
 </body>
