@@ -48,9 +48,10 @@
                     <div id="chat-widget">
                         <div id="chat-messages"></div>
                         <div id="chat-input-container">
-                            <input type="text" id="chat-input" placeholder="Type a message...">
+                            <input type="text" id="chat-input" placeholder="Type or speak a message...">
                             <button id="chat-send">Send</button>
-                            <button id="voice-toggle" title="Toggle Voice">🎙️</button>
+                            <button id="voice-toggle" title="Toggle Voice Output">🔊</button>
+                            <button id="mic-toggle" title="Voice Input">🎤</button>
                         </div>
                     </div>
                 </section>
@@ -100,9 +101,46 @@
         const chatInput = document.getElementById('chat-input');
         const chatSend = document.getElementById('chat-send');
         const voiceToggle = document.getElementById('voice-toggle');
+        const micToggle = document.getElementById('mic-toggle');
         const voiceStatus = document.getElementById('voice-status');
         let messages = [];
-        let voiceEnabled = false;
+        let voiceOutputEnabled = false;
+        let voiceInputEnabled = false;
+        
+        // Web Speech API Setup
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            
+            recognition.onresult = (event) => {
+                const transcript = Array.from(event.results)
+                    .map(result => result[0].transcript)
+                    .join('');
+                chatInput.value = transcript;
+                
+                if (event.results[0].isFinal) {
+                    sendMessage();
+                }
+            };
+            
+            recognition.onerror = (event) => {
+                console.log('Speech recognition error:', event.error);
+                if (event.error === 'not-allowed') {
+                    addMessage("Microphone access denied. Please enable microphone permissions.", false);
+                }
+            };
+            
+            recognition.onend = () => {
+                if (voiceInputEnabled) {
+                    recognition.start();
+                }
+            };
+        }
         
         function addMessage(text, isUser = true) {
             const msgDiv = document.createElement('div');
@@ -127,12 +165,38 @@
         chatSend.addEventListener('click', sendMessage);
         chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
         
-        // Voice Toggle
+        // Voice Output Toggle (ElevenLabs TTS)
         voiceToggle.addEventListener('click', () => {
-            voiceEnabled = !voiceEnabled;
-            voiceStatus.textContent = voiceEnabled ? '🔊' : '🔇';
-            voiceStatus.className = voiceEnabled ? 'voice-on' : 'voice-off';
-            addMessage(`Voice ${voiceEnabled ? 'enabled' : 'disabled'}`, false);
+            voiceOutputEnabled = !voiceOutputEnabled;
+            voiceStatus.textContent = voiceOutputEnabled ? '🔊' : '🔇';
+            voiceStatus.className = voiceOutputEnabled ? 'voice-on' : 'voice-off';
+            addMessage(`Voice output ${voiceOutputEnabled ? 'enabled' : 'disabled'}`, false);
+            
+            if (voiceOutputEnabled) {
+                speakText("Voice output enabled. I'm Master Oogway, ready to assist you.");
+            }
+        });
+        
+        // Microphone Input Toggle (Web Speech API)
+        micToggle.addEventListener('click', () => {
+            if (!recognition) {
+                addMessage("Speech recognition not supported in this browser. Try Chrome.", false);
+                return;
+            }
+            
+            voiceInputEnabled = !voiceInputEnabled;
+            micToggle.style.background = voiceInputEnabled ? 
+                'linear-gradient(135deg, #00ff00, #00cc00)' : 
+                'linear-gradient(135deg, #666, #444)';
+            
+            if (voiceInputEnabled) {
+                recognition.start();
+                addMessage("Microphone active. Speak now...", false);
+                speakText("Microphone active. Speak now.");
+            } else {
+                recognition.stop();
+                addMessage("Microphone disabled.", false);
+            }
         });
         
         // ElevenLabs Text-to-Speech
@@ -180,17 +244,26 @@
                 addMessage(text, true);
                 chatInput.value = '';
                 
-                // Simulate bot response
+                // Process message and respond
                 setTimeout(() => {
-                    const responses = [
-                        "I'm Master Oogway. How can I assist you today?",
-                        "The dashboard is ready. What would you like to know?",
-                        "I'm here to help with your metrics and tools.",
-                        "Let me know if you need any assistance."
-                    ];
-                    const response = responses[Math.floor(Math.random() * responses.length)];
+                    let response = "";
+                    
+                    // Simple command processing
+                    if (text.toLowerCase().includes("market") || text.toLowerCase().includes("price")) {
+                        response = "The market section shows live prices for BTC, ETH, AAPL, and TSLA. They update every 2 seconds.";
+                    } else if (text.toLowerCase().includes("help")) {
+                        response = "I'm Master Oogway. You can ask me about market data, dashboard features, or enable voice input with the microphone button.";
+                    } else if (text.toLowerCase().includes("hello") || text.toLowerCase().includes("hi")) {
+                        response = "Greetings! I'm Master Oogway, your autonomous assistant. How may I assist you today?";
+                    } else {
+                        response = "I'm Master Oogway. How can I assist you today?";
+                    }
+                    
                     addMessage(response, false);
-                    speakText(response);
+                    
+                    if (voiceOutputEnabled) {
+                        speakText(response);
+                    }
                 }, 500);
             }
         };

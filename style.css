@@ -339,8 +339,8 @@ section h2 {
     border-top: 1px solid rgba(0, 255, 255, 0.2);
 }
 
-#voice-toggle {
-    background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+#voice-toggle, #mic-toggle {
+    background: linear-gradient(135deg, #666, #444);
     border: none;
     color: #fff;
     padding: 8px 12px;
@@ -350,13 +350,16 @@ section h2 {
     transition: transform 0.2s, background 0.2s;
 }
 
-#voice-toggle:hover {
+#voice-toggle:hover, #mic-toggle:hover {
     transform: scale(1.1);
-    background: linear-gradient(135deg, #ff8585, #ff6b6b);
 }
 
-#voice-toggle:active {
+#voice-toggle:active, #mic-toggle:active {
     transform: scale(0.95);
+}
+
+#mic-toggle.active {
+    background: linear-gradient(135deg, #00ff00, #00cc00);
 }
 
 #voice-status {
