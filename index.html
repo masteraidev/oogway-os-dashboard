@@ -131,7 +131,14 @@
             recognition.onerror = (event) => {
                 console.log('Speech recognition error:', event.error);
                 if (event.error === 'not-allowed') {
-                    addMessage("Microphone access denied. Please enable microphone permissions.", false);
+                    addMessage("Microphone access denied. Please enable microphone permissions in your browser.", false);
+                    voiceInputEnabled = false;
+                    micToggle.classList.remove('active');
+                    micToggle.style.background = 'linear-gradient(135deg, #666, #444)';
+                } else if (event.error === 'no-speech') {
+                    addMessage("No speech detected. Try speaking again.", false);
+                } else if (event.error === 'audio-capture') {
+                    addMessage("No microphone found. Please connect a microphone.", false);
                 }
             };
             
@@ -185,17 +192,18 @@
             }
             
             voiceInputEnabled = !voiceInputEnabled;
+            micToggle.classList.toggle('active', voiceInputEnabled);
             micToggle.style.background = voiceInputEnabled ? 
                 'linear-gradient(135deg, #00ff00, #00cc00)' : 
                 'linear-gradient(135deg, #666, #444)';
             
             if (voiceInputEnabled) {
                 recognition.start();
-                addMessage("Microphone active. Speak now...", false);
+                addMessage("🎤 Microphone active. Speak now...", false);
                 speakText("Microphone active. Speak now.");
             } else {
                 recognition.stop();
-                addMessage("Microphone disabled.", false);
+                addMessage("🎤 Microphone disabled.", false);
             }
         });
         
@@ -255,6 +263,8 @@
                         response = "I'm Master Oogway. You can ask me about market data, dashboard features, or enable voice input with the microphone button.";
                     } else if (text.toLowerCase().includes("hello") || text.toLowerCase().includes("hi")) {
                         response = "Greetings! I'm Master Oogway, your autonomous assistant. How may I assist you today?";
+                    } else if (text.toLowerCase().includes("record") || text.toLowerCase().includes("mic") || text.toLowerCase().includes("voice")) {
+                        response = "Click the 🎤 microphone button to enable voice input, then speak your message.";
                     } else {
                         response = "I'm Master Oogway. How can I assist you today?";
                     }
@@ -270,7 +280,8 @@
         
         addMessage("Welcome to OOGWAY OS Dashboard!", false);
         addMessage("I'm here to help you navigate your metrics and tools.", false);
-        speakText("Welcome to OOGWAY OS Dashboard. I'm Master Oogway, ready to assist you.");
+        addMessage("Click 🎤 to enable voice input, click 🔊 to enable voice output.", false);
+        speakText("Welcome to OOGWAY OS Dashboard. I'm Master Oogway, ready to assist you. Click the microphone button to enable voice input.");
         
         // Real-time metrics updates
         let taskCount = 0, revenue = 0;
