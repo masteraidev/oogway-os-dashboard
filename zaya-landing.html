@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Zaya by XIA Labs — Your AI assistant that actually does the work, available 24/7 on WhatsApp." />
+  <title>Zaya by XIA Labs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg-2: #111111;
+      --bg-3: #161616;
+      --blue: #4FACFE;
+      --blue-dim: rgba(79, 172, 254, 0.12);
+      --blue-mid: rgba(79, 172, 254, 0.25);
+      --white: #ffffff;
+      --gray-1: rgba(255,255,255,0.85);
+      --gray-2: rgba(255,255,255,0.55);
+      --gray-3: rgba(255,255,255,0.12);
+      --gray-4: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.08);
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--white);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE TEXTURE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    section, header, footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── LAYOUT ─── */
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gray-2);
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--blue);
+    }
+
+    .header-badge {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--blue);
+      background: var(--blue-dim);
+      border: 1px solid rgba(79, 172, 254, 0.2);
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 80px 0 72px;
+      text-align: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 28px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 1px;
+      background: var(--blue);
+      opacity: 0.7;
+    }
+
+    .hero-eyebrow::after {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 1px;
+      background: var(--blue);
+      opacity: 0.7;
+    }
+
+    .hero h1 {
+      font-size: clamp(52px, 14vw, 80px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.0;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.75) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero h1 .accent {
+      background: linear-gradient(135deg, #4FACFE 0%, #8dd6ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(16px, 4.5vw, 20px);
+      font-weight: 400;
+      color: var(--gray-2);
+      max-width: 480px;
+      margin: 0 auto 40px;
+      line-height: 1.55;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue);
+      color: #000;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 14px 28px;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+      letter-spacing: -0.01em;
+    }
+
+    .hero-cta:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .hero-cta svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ─── GRADIENT DIVIDER ─── */
+    .glow-line {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
+      opacity: 0.25;
+      margin: 0 0 72px;
+    }
+
+    /* ─── SECTION HEADERS ─── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(26px, 7vw, 36px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .section-desc {
+      font-size: 15px;
+      color: var(--gray-2);
+      margin-bottom: 40px;
+      line-height: 1.6;
+    }
+
+    /* ─── FEATURES ─── */
+    .features {
+      padding: 0 0 80px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .feature-card {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(79, 172, 254, 0.25);
+      background: #1a1a1a;
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--blue-dim);
+      border: 1px solid rgba(79, 172, 254, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
+    }
+
+    .feature-text h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--white);
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-text p {
+      font-size: 14px;
+      color: var(--gray-2);
+      line-height: 1.5;
+    }
+
+    /* ─── WHO IT'S FOR ─── */
+    .audience {
+      padding: 0 0 80px;
+    }
+
+    .audience-cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .audience-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .audience-number {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue);
+      opacity: 0.6;
+      letter-spacing: 0.08em;
+      min-width: 24px;
+    }
+
+    .audience-info h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.01em;
+      margin-bottom: 2px;
+    }
+
+    .audience-info p {
+      font-size: 13px;
+      color: var(--gray-2);
+    }
+
+    /* ─── PRICING ─── */
+    .pricing {
+      padding: 0 0 80px;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .pricing-card {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 22px;
+      text-align: center;
+    }
+
+    .pricing-card.featured {
+      border-color: rgba(79, 172, 254, 0.35);
+      background: linear-gradient(145deg, #121820, #0e1520);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pricing-card.featured::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
+    }
+
+    .pricing-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray-2);
+      margin-bottom: 14px;
+    }
+
+    .pricing-amount {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .pricing-card.featured .pricing-amount {
+      color: var(--blue);
+    }
+
+    .pricing-period {
+      font-size: 12px;
+      color: var(--gray-2);
+      font-weight: 400;
+    }
+
+    .pricing-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--gray-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .pricing-note::before {
+      content: '';
+      display: block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--blue);
+      opacity: 0.7;
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .how {
+      padding: 0 0 80px;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step:last-child {
+      border-bottom: none;
+    }
+
+    .step-num-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      flex-shrink: 0;
+    }
+
+    .step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(79, 172, 254, 0.3);
+      background: var(--blue-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue);
+      flex-shrink: 0;
+    }
+
+    .step-body h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--white);
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+      padding-top: 6px;
+    }
+
+    .step-body p {
+      font-size: 14px;
+      color: var(--gray-2);
+      line-height: 1.55;
+    }
+
+    /* ─── CTA ─── */
+    .cta-section {
+      padding: 0 0 80px;
+    }
+
+    .cta-box {
+      background: linear-gradient(145deg, #0f1824, #0a1020);
+      border: 1px solid rgba(79, 172, 254, 0.2);
+      border-radius: 20px;
+      padding: 52px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(79, 172, 254, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-box h2 {
+      font-size: clamp(28px, 8vw, 40px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .cta-box p {
+      font-size: 15px;
+      color: var(--gray-2);
+      margin-bottom: 32px;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue);
+      color: #000;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 15px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .cta-btn:hover {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .cta-sub {
+      margin-top: 16px !important;
+      font-size: 12px !important;
+      color: var(--gray-2) !important;
+      margin-bottom: 0 !important;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer-site {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray-2);
+      text-decoration: none;
+    }
+
+    .footer-site:hover {
+      color: var(--white);
+    }
+
+    .footer-credit {
+      font-size: 12px;
+      color: var(--gray-3);
+      letter-spacing: 0.02em;
+    }
+
+    /* ─── RESPONSIVE (tablet+) ─── */
+    @media (min-width: 480px) {
+      .feature-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .audience-cards {
+        gap: 10px;
+      }
+    }
+
+    @media (min-width: 600px) {
+      .hero {
+        padding: 100px 0 88px;
+      }
+
+      .container {
+        padding: 0 28px;
+      }
+    }
+
+    /* ─── ANIMATION ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    .hero h1, .hero-sub, .hero-cta {
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero-sub  { animation-delay: 0.1s; }
+    .hero-cta  { animation-delay: 0.2s; }
+  </style>
+</head>
+<body>
+
+  <!-- ─── HEADER ─── -->
+  <header>
+    <div class="container">
+      <div class="header-inner">
+        <a class="logo" href="#">XIA <span>Labs</span></a>
+        <span class="header-badge">Now Enrolling</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-eyebrow">Introducing Zaya</div>
+      <h1>Meet <span class="accent">Zaya</span></h1>
+      <p class="hero-sub">Your AI assistant that actually does the work — available 24/7 on WhatsApp.</p>
+      <a class="hero-cta" href="https://calendly.com/xialabs" target="_blank" rel="noopener">
+        Book a Strategy Call
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+
+  <div class="container"><div class="glow-line"></div></div>
+
+  <!-- ─── WHAT ZAYA DOES ─── -->
+  <section class="features">
+    <div class="container">
+      <div class="section-label">Capabilities</div>
+      <h2 class="section-title">What Zaya does</h2>
+      <p class="section-desc">One assistant. Every operational layer of your business.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📅</div>
+          <div class="feature-text">
+            <h3>Calendar, email & tasks</h3>
+            <p>Manage your entire schedule and inbox via WhatsApp — no extra apps.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-text">
+            <h3>Content automation</h3>
+            <p>Automates your full content workflow, from drafts to publishing.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <div class="feature-text">
+            <h3>Business metrics</h3>
+            <p>Tracks your key numbers in real time and surfaces what matters.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🧠</div>
+          <div class="feature-text">
+            <h3>Gets smarter over time</h3>
+            <p>Learns how you work and continuously improves its output for you.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── WHO IT'S FOR ─── -->
+  <section class="audience">
+    <div class="container">
+      <div class="section-label">Who it's for</div>
+      <h2 class="section-title">Built for operators</h2>
+      <p class="section-desc">If you're running a business and tired of doing everything manually, Zaya is for you.</p>
+
+      <div class="audience-cards">
+        <div class="audience-card">
+          <div class="audience-number">01</div>
+          <div class="audience-info">
+            <h3>Founders doing $10k–$100k/month</h3>
+            <p>Stop being the bottleneck. Delegate to Zaya.</p>
+          </div>
+        </div>
+        <div class="audience-card">
+          <div class="audience-number">02</div>
+          <div class="audience-info">
+            <h3>Coaches &amp; consultants</h3>
+            <p>Spend time delivering, not managing logistics.</p>
+          </div>
+        </div>
+        <div class="audience-card">
+          <div class="audience-number">03</div>
+          <div class="audience-info">
+            <h3>Small teams, big ambitions</h3>
+            <p>Operate like a company three times your size.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── PRICING ─── -->
+  <section class="pricing">
+    <div class="container">
+      <div class="section-label">Pricing</div>
+      <h2 class="section-title">Simple, transparent</h2>
+      <p class="section-desc">No hidden fees. No long-term lock-in.</p>
+
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-label">Setup</div>
+          <div class="pricing-amount">$2,500</div>
+          <div class="pricing-period">one time</div>
+        </div>
+        <div class="pricing-card featured">
+          <div class="pricing-label">Monthly</div>
+          <div class="pricing-amount">$750</div>
+          <div class="pricing-period">per month</div>
+        </div>
+      </div>
+
+      <p class="pricing-note">Limited spots available — we onboard selectively.</p>
+    </div>
+  </section>
+
+  <!-- ─── HOW IT WORKS ─── -->
+  <section class="how">
+    <div class="container">
+      <div class="section-label">Process</div>
+      <h2 class="section-title">How it works</h2>
+      <p class="section-desc">From kickoff to fully operational in days, not months.</p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num-wrap">
+            <div class="step-num">1</div>
+          </div>
+          <div class="step-body">
+            <h3>We map your business</h3>
+            <p>We do a deep-dive session to understand your workflows, tools, and goals.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num-wrap">
+            <div class="step-num">2</div>
+          </div>
+          <div class="step-body">
+            <h3>We build your Zaya</h3>
+            <p>Custom-configured for your exact stack and the way you operate.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num-wrap">
+            <div class="step-num">3</div>
+          </div>
+          <div class="step-body">
+            <h3>You text. It handles it.</h3>
+            <p>Just message Zaya on WhatsApp and watch your business run itself.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA ─── -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Ready to build?</h2>
+        <p>Let's talk about your business and see if Zaya is the right fit.</p>
+        <a class="cta-btn" href="https://calendly.com/xialabs" target="_blank" rel="noopener">
+          Book a Strategy Call
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        <p class="cta-sub">No commitment. 30-minute call.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <a class="footer-site" href="https://xialabs.ai" target="_blank" rel="noopener">xialabs.ai</a>
+        <span class="footer-credit">Built by Jacoby &amp; Uzair</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
